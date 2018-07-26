@@ -1,0 +1,7 @@
+newman run LearnAPITesting.postman_collection.json -e Weather_API.postman_environment.json -n 10
+
+
+
+
+https://www.getpostman.com/docs/v6/postman/scripts/test_examples
+https://www.getpostman.com/docs/v6/postman/scripts/postman_sandbox_api_reference

@@ -1,0 +1,193 @@
+{
+	"info": {
+		"_postman_id": "47dc74c5-0bd6-456f-817d-543309033239",
+		"name": "LearnAPITesting",
+		"description": "Project to learn Rest API ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"_postman_id": "035d873d-a5ca-4c1d-9544-7f6a5bf5135c",
+			"name": "https://maps.googleapis.com/maps/api/geocode/json?address=Wipro+EC4&key=${{key_Value}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "492e89f9-3a91-4131-9a5c-54e86f3be754",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"ex_latitude\", jsonData.results[0].geometry.location.lat);",
+							"pm.environment.set(\"ex_longitude\", jsonData.results[0].geometry.location.lng);",
+							"pm.environment.set(\"ex_address\", jsonData.results[0].formatted_address);",
+							"console.log(\"latitude : \"+ pm.variables.get(\"ex_latitude\"));",
+							"console.log(\"longitude : \"+pm.variables.get(\"ex_longitude\"));",
+							"console.log(\"Address : \"+pm.variables.get(\"ex_address\"));",
+							"",
+							"",
+							"pm.test(\"Found formatted address\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Bengaluru, Karnataka 560100\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://maps.googleapis.com/maps/api/geocode/json?address=Wipro+Electronic+City+4,+Tower+9&key={{google_key_value}}",
+					"protocol": "https",
+					"host": [
+						"maps",
+						"googleapis",
+						"com"
+					],
+					"path": [
+						"maps",
+						"api",
+						"geocode",
+						"json"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "Wipro+Electronic+City+4,+Tower+9"
+						},
+						{
+							"key": "key",
+							"value": "{{google_key_value}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "43628e64-1118-47e7-9d7e-f4e9cb01dba1",
+			"name": "https://api.darksky.net/forecast/{{weather_api}}/{{ex_latitude}},{{ex_longitude}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "88edffeb-d569-4da6-99fa-a79d53033e54",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Found correct timezone\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Asia/Kolkata\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://api.darksky.net/forecast/{{weather_api}}/{{ex_latitude}},{{ex_longitude}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"darksky",
+						"net"
+					],
+					"path": [
+						"forecast",
+						"{{weather_api}}",
+						"{{ex_latitude}},{{ex_longitude}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "7303fa39-19fc-4d80-85dd-a1c2278f63d1",
+			"name": "https://maps.googleapis.com/maps/api/geocode/json?latlng={{ex_latitude}},{{ex_longitude}}&key={{google_key_value}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "421fca99-1a61-4842-9d1f-f6bbb971e557",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Found text Wipro Technologies in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Wipro Technologies\");",
+							"});",
+							"",
+							"pm.test(\"Found pincode in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"560100\");",
+							"});",
+							"",
+							"pm.test(\"Found text EC4 Tower 10 in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"EC4 Tower 10\");",
+							"});",
+							"",
+							"pm.test(\"Found text Bangalore Urban in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Bangalore Urban\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.environment.set(\"ex_full_address\", jsonData.results[0].formatted_address);",
+							"console.log(\"latitude : \"+ pm.variables.get(\"ex_latitude\"));",
+							"console.log(\"longitude : \"+pm.variables.get(\"ex_longitude\"));",
+							"console.log(\"Complete Address : \"+pm.variables.get(\"ex_full_address\"));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://maps.googleapis.com/maps/api/geocode/json?latlng={{ex_latitude}},{{ex_longitude}}&key={{google_key_value}}",
+					"protocol": "https",
+					"host": [
+						"maps",
+						"googleapis",
+						"com"
+					],
+					"path": [
+						"maps",
+						"api",
+						"geocode",
+						"json"
+					],
+					"query": [
+						{
+							"key": "latlng",
+							"value": "{{ex_latitude}},{{ex_longitude}}"
+						},
+						{
+							"key": "key",
+							"value": "{{google_key_value}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
