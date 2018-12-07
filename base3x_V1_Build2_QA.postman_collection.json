@@ -1,0 +1,892 @@
+{
+	"info": {
+		"_postman_id": "e06beffd-cbe5-47f2-b434-1e2d92b9f293",
+		"name": "base3x_V1_Build2_QA",
+		"description": "Base-3x-Build2-Version1-Script",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetBaseTokenV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5cf26ca0-3892-4e01-afb9-4c01a9cb1f62",
+						"exec": [
+							"//let jsonData = pm.response.json();",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.environment.set(\"token\", jsonData.access_token);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "TrustedClient@2018",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "Rbacl_Trusted_Client",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"description": "the body of the HTTP message sent to the server is essentially one giant query string -- name/value pairs are separated by the ampersand (&), and names are separated from values by the equals symbol (=)",
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"description": "User Grant Type",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "rm@wipro.com",
+							"description": "Username",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "raunak27",
+							"description": "Password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://rbaclauth-b3xqa.platform.deltaverge.com/oauth/token",
+					"protocol": "https",
+					"host": [
+						"rbaclauth-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "<strong>Basic Auth is required.</strong> <br>\n<strong>Username</strong>: Rbacl_Trusted_Client<br>\n<strong>Password</strong>: TrustedClient@2018<br>"
+			},
+			"response": []
+		},
+		{
+			"name": "ViewUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Found rm@wipro.com in the response body\", function () {",
+							"    pm.expect(jsonData.userList[0].emailId).to.eql('rm@wipro.com');",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"description": "Access_Token from oauth/token",
+						"type": "text"
+					},
+					{
+						"key": "tenantid",
+						"value": "wipro",
+						"description": "Tenant Id",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong>Web Service call to get details of all the users present in the system.<strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "CreateUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aadcf86a-4975-4827-952a-cf31ab054fed",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"New User is Created: Email found in response\", function () {",
+							"    pm.expect(jsonData.userList[jsonData.userList.length-1].emailId).to.eql('fl1@wipro.com');",
+							"});",
+							"",
+							"",
+							"pm.environment.set(\"NewID\", jsonData.userList[jsonData.userList.length-1]._id);",
+							"pm.environment.set(\"userPassword\", jsonData.userList[jsonData.userList.length-1].password);",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"description": "Access_Token from oauth/token",
+						"type": "text"
+					},
+					{
+						"key": "tenantid",
+						"value": "wipro",
+						"description": "Tenant Id",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"description": "JSON Body",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\" : \"fname1\",\r\n    \"lastName\" : \"lname1\",\r\n    \"emailId\" : \"fl1@wipro.com\",\r\n    \"password\" : \"raunak27\",\r\n    \"skills\" : \"Performance Testing, Security Testing\",\r\n    \"totalExperience\" : \"10\",\r\n    \"pastExperienceWithinWipro\" : \"1\",\r\n    \"lastRole\" : \"Software Test Engineer\",\r\n    \"lastAccount\" : \"DV\",\r\n    \"process\" : [ \r\n        {\r\n            \"_id\" : \"10251\",\r\n            \"processName\" : \"R2R\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"_id\" : \"5bb736c06bca96161cdab765\",\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : true,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }, \r\n        {\r\n            \"_id\" : \"10253\",\r\n            \"processName\" : \"AP\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"_id\" : \"5bb736c06bca96161cdab765\",\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : true,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}\r\n"
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/createuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"createuser1.0"
+					]
+				},
+				"description": "<strong>Web Service call to create users in the system with two processes assigned to them, namely R2R and AP.<strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmNewlyCreateUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"New User Created Successfully - Email: fl1@wipro.com found in the response\", function () {",
+							"    pm.expect(jsonData.userList[jsonData.userList.length-1].emailId).to.eql('fl1@wipro.com');",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong>Validates whether newly created user is available in the system or not using email id 'fl1@wipro.com'.</strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "BlockUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8876e154-52a4-4c9c-b7f0-3ce5b2a9a5c8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "tenantid",
+						"value": "wipro",
+						"description": "Tenant Id",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"description": "Access_Token from oauth/token",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"description": "JSON Body",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"_id\" : \"{{NewID}}\",\r\n    \"firstName\" : \"fname1\",\r\n    \"lastName\" : \"lname1\",\r\n    \"emailId\" : \"fl1@wipro.com\",\r\n    \"password\" : \"{{userPassword}}\",\r\n    \"skills\" : \"Performance Testing, Security Testing\",\r\n    \"totalExperience\" : \"10\",\r\n    \"pastExperienceWithinWipro\" : \"1\",\r\n    \"process\" : [ \r\n        {\r\n            \"processName\" : \"R2R\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }, \r\n        {\r\n            \"processName\" : \"AP\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"lastRole\" : \"Software Test Engineer\",\r\n    \"lastAccount\" : \"DV\",\r\n    \"_class\" : \"com.wipro.base3X.rbaclentity.User\"\r\n}"
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user2.0/blockuser2.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user2.0",
+						"blockuser2.0"
+					]
+				},
+				"description": "<strong> Changes the status of the user to Blocked state </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmUserIsBlockedV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"New User is Blocked\", function () {",
+							"    pm.expect(jsonData.userList[jsonData.userList.length-1].isBlocked).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong>Verifies user is blocked or not</strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4272b6db-ba34-4b76-aa1c-c9f7605c06e9",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Modified Successfully\", function () {",
+							"    pm.expect(jsonData.message).to.eql('Modified Successfully');",
+							"});",
+							"",
+							"pm.test(\"Skills Updated Successfully\", function () {",
+							"    pm.expect(jsonData.userList[0].skills).to.eql('Performance and Security Testing of Business Enterprise Applications');",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					},
+					{
+						"description": "JSON Body",
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"_id\" : \"{{NewID}}\",\r\n    \"firstName\" : \"fname1\",\r\n    \"lastName\" : \"lname1\",\r\n    \"emailId\" : \"fl1@wipro.com\",\r\n    \"password\" : \"{{userPassword}}\",\r\n    \"skills\" : \"Performance and Security Testing of Business Enterprise Applications\",\r\n    \"totalExperience\" : \"10\",\r\n    \"pastExperienceWithinWipro\" : \"1\",\r\n    \"process\" : [ \r\n        {\r\n            \"processName\" : \"R2R\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }, \r\n        {\r\n            \"processName\" : \"AP\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"lastRole\" : \"Software Test Engineer\",\r\n    \"lastAccount\" : \"DV\",\r\n    \"_class\" : \"com.wipro.base3X.rbaclentity.User\"\r\n}"
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user2.0/updateuser2.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user2.0",
+						"updateuser2.0"
+					]
+				},
+				"description": "<strong> Updates the skills of the user details provided in the body </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmUserDetailsAreUpdatedV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Updated skills found in the response\", function () {",
+							"    pm.expect(jsonData.userList[jsonData.userList.length-1].skills).to.eql('Performance and Security Testing of Business Enterprise Applications');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong> Validate user details are updated by finding specified text in the response </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "SuspendUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a46e0663-5666-4ef6-bc0a-8d3719bf862c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "tenantid",
+						"value": "wipro",
+						"description": "Tenant Id",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"description": "Access_Token from oauth/token",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"description": "JSON Body",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"_id\" : \"{{NewID}}\",\r\n    \"firstName\" : \"fname1\",\r\n    \"lastName\" : \"lname1\",\r\n    \"emailId\" : \"fl1@wipro.com\",\r\n    \"password\" : \"{{userPassword}}\",\r\n    \"skills\" : \"Performance and Security Testing of Business Enterprise Applications\",\r\n    \"totalExperience\" : \"10\",\r\n    \"pastExperienceWithinWipro\" : \"1\",\r\n    \"process\" : [ \r\n        {\r\n            \"processName\" : \"R2R\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }, \r\n        {\r\n            \"processName\" : \"AP\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"lastRole\" : \"Software Test Engineer\",\r\n    \"lastAccount\" : \"DV\",\r\n    \"_class\" : \"com.wipro.base3X.rbaclentity.User\"\r\n}"
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user2.0/suspendtuser2.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user2.0",
+						"suspendtuser2.0"
+					]
+				},
+				"description": "<strong> Changes the status of the user to Suspend state </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmUserIsSuspendedV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"New User is Suspended\", function () {",
+							"    pm.expect(jsonData.userList[jsonData.userList.length-1].isSuspended).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong> Validate user is suspended or not </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUserV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "29794e22-dba8-460b-adce-41fc007329f2",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let jsonData = pm.response.json();",
+							"",
+							"pm.test(\"New User is Suspended\", function () {",
+							"    pm.expect(jsonData.message).to.eql('Successfully deleted');",
+							"});",
+							"",
+							"pm.test(\"Response time within 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text",
+						"description": "Access_Token from oauth/token"
+					},
+					{
+						"key": "tenantid",
+						"value": "wipro",
+						"type": "text",
+						"description": "Tenant Id"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"description": "JSON Body"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"_id\" : \"{{NewID}}\",\r\n    \"firstName\" : \"fname1\",\r\n    \"lastName\" : \"lname1\",\r\n    \"emailId\" : \"fl1@wipro.com\",\r\n    \"password\" : \"{{userPassword}}\",\r\n    \"skills\" : \"Performance and Security Testing of Business Enterprise Applications\",\r\n    \"totalExperience\" : \"10\",\r\n    \"pastExperienceWithinWipro\" : \"1\",\r\n    \"process\" : [ \r\n        {\r\n            \"processName\" : \"R2R\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }, \r\n        {\r\n            \"processName\" : \"AP\",\r\n            \"roleList\" : [ \r\n                {\r\n                    \"sysName\" : \"BA\",\r\n                    \"displayLabel\" : \"BA\",\r\n                    \"category\" : \"ServiceProvider\",\r\n                    \"isGolden\" : false,\r\n                    \"subRole\" : {\r\n                        \"sysName\" : \"BA\",\r\n                        \"displayLabel\" : \"BA\",\r\n                        \"isCloned\" : false\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"lastRole\" : \"Software Test Engineer\",\r\n    \"lastAccount\" : \"DV\",\r\n    \"_class\" : \"com.wipro.base3X.rbaclentity.User\"\r\n}"
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user2.0/deleteuser2.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user2.0",
+						"deleteuser2.0"
+					]
+				},
+				"description": "<strong> Deletes the newly created user from the system </strong>"
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmUserIsDeletedV1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e9188cc-bdb6-465d-a7ec-9e435170a786",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"User is Deleted Successfully\", function () ",
+							"{",
+							"    pm.expect(pm.response.text()).to.not.include(\"fl1@wipro.com\");",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 2 Second\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"",
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"NewID\");",
+							"pm.environment.unset(\"userPassword\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"description": "Access_Token from oauth/token",
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer {{token}}"
+					},
+					{
+						"description": "Tenant Id",
+						"key": "tenantid",
+						"type": "text",
+						"value": "wipro"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://gems-b3xqa.platform.deltaverge.com/protected/usermgmt1.0/user1.0/viewuser1.0",
+					"protocol": "https",
+					"host": [
+						"gems-b3xqa",
+						"platform",
+						"deltaverge",
+						"com"
+					],
+					"path": [
+						"protected",
+						"usermgmt1.0",
+						"user1.0",
+						"viewuser1.0"
+					]
+				},
+				"description": "<strong> Validate user is deleted or not </strong>"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8896f7f8-8f7f-4581-8af5-cd892d5b5b94",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e7f589cc-a637-49f8-ab4d-6eba6724c0cd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
